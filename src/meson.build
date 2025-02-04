@@ -13,11 +13,17 @@
 # limitations under the License.
 #
 
+# Needed on armhf for software implementation of missing hardware atomics.
+# Should be ignored on platforms which have the hardware atomics because of the
+# --as-needed flag automatically added by meson.
+cc = meson.get_compiler('c')
+dep_atomic = cc.find_library('atomic')
+
 percetto_lib = library(
   'percetto',
   'percetto.cc',
   'perfetto-port.cc',
-  dependencies: dep_perfetto,
+  dependencies: [dep_perfetto, dep_atomic],
   cpp_args : ['-fvisibility=hidden', '-fdata-sections', '-ffunction-sections', '-Os'],
   link_args : ['-Wl,--gc-sections', '-Wl,--exclude-libs,ALL'],
   install : true,
