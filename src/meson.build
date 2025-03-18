@@ -19,14 +19,13 @@
 cc = meson.get_compiler('c')
 dep_atomic = cc.find_library('atomic')
 
-percetto_lib = library(
+percetto_lib = static_library(
   'percetto',
   'percetto.cc',
   'perfetto-port.cc',
   dependencies: [dep_perfetto, dep_atomic],
   cpp_args : ['-fvisibility=hidden', '-fdata-sections', '-ffunction-sections', '-Os'],
   link_args : ['-Wl,--gc-sections', '-Wl,--exclude-libs,ALL'],
-  install : true,
 )
 
 percetto_dep = declare_dependency(
@@ -35,13 +34,12 @@ percetto_dep = declare_dependency(
 )
 meson.override_dependency('percetto', percetto_dep)
 
-atrace_lib = library(
+atrace_lib = static_library(
   'percetto-atrace',
   'percetto-atrace.c',
   dependencies: percetto_dep,
   c_args : ['-fvisibility=hidden', '-fdata-sections', '-ffunction-sections', '-Os'],
   link_args : ['-Wl,--gc-sections', '-Wl,--exclude-libs,ALL'],
-  install : true,
 )
 
 atrace_dep = declare_dependency(
@@ -49,8 +47,6 @@ atrace_dep = declare_dependency(
   link_with: atrace_lib,
 )
 meson.override_dependency('percetto-atrace', atrace_dep)
-
-install_headers('percetto.h', 'percetto-atrace.h')
 
 pkg = import('pkgconfig')
 pkg.generate(percetto_lib, description : 'C API wrapper library for perfetto')
